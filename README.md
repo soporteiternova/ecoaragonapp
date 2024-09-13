@@ -1,6 +1,6 @@
 # GeoRiesgos Aragón
 
-La aplicación ERAragón, permite a los usuarios ver la localización de todos los sistemas de generación de energías renovables, situados en el territorio de la comunidad autónoma.
+La aplicación ECOAragón, permite a los usuarios ver la localización de todos los sistemas de generación de energías renovables, situados en el territorio de la comunidad autónoma.
 
 **Aplicación subvencionada por el Gobierno de Aragón**
 
