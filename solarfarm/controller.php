@@ -58,8 +58,8 @@ class controller {
      */
     protected function crondaemon($debug = false) {
         // Loading of solar farms data
-        $datetime = date( 'Hi' );
-        if ( $debug || $datetime === '0005' ) {
+        $datetime = date( 'H' );
+        if ( $debug || $datetime === '12' ) {
             $count = 0;
             $api_url = \ecoaragonapp\common\controller::get_endpoint_url( \ecoaragonapp\common\controller::ENDPOINT_SOLAR_FARM );
             $array_objs = json_decode( file_get_contents( $api_url ) );
