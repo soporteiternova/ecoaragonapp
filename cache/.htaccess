@@ -1,0 +1,4 @@
+<FilesMatch "\.(htaccess|key|php|cache)$">
+	Order Allow,Deny
+	Deny from all
+</FilesMatch>
