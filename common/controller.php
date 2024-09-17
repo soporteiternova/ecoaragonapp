@@ -94,7 +94,7 @@ class controller {
                                 <li><a href="https://github.com/soporteiternova/ecoaragonapp" target="_blank" class="icon brands circle fa-github"><span class="label">Github</span></a></li>
                             </ul>
                             <ul class="copyright">
-                                <li>' . date( 'Y' ) . ' <a href="https://www.iternova.net/" target="_blank">ITERNOVA</a></li>
+                                <li>Aplicaci&oacute;n subvencionada por el Gobierno de Arag&oacute;n con un importe de 6000&euro; - ' . date( 'Y' ) . ' <a href="https://www.iternova.net/" target="_blank">ITERNOVA</a></li>
                             </ul>
                         </footer>
                 </div>
