@@ -150,11 +150,11 @@ class controller {
                 <article id="main">
                     <section class="wrapper container">
                         <div style="width:100%; text-align:center"><a href="https://aragon.es/" target="_blank"><img src="img/logo_gobierno_aragon.png" alt="Gobierno de Arag&oacute;n" style="width:30%;"/></a></div>
-                        <h2 style="text-align: center; width:100%">Proyecto financiado por el Gobierno de Arag&oacute;n</h2><hr>
                         <!--<span class="icon solid fa-car-crash"></span>-->
                         <h2 style="text-align:center; width:100%"><b>ECOArag&oacute;n APP</b></h2>
                         <p>Toda la informaci&oacute;n en tiempo real sobre la generaci&oacute;n de energ&iacute;as renovables en la Comunidad Aut&oacute;noma de Arag&oacute;n.</p>
                         <p>Este es un programa inform&aacute;tico de software libre denominado "ECOArag&oacute;n APP" que forma parte de la subvenci&oacute;n de software libre, seg&uacute;n ORDEN HAP/342/2024, de 25 de marzo, por la que se convocan subvenciones de apoyo al software libre dirigidas a microempresas y a trabajadores aut&oacute;nomos.</p>
+                        <p>Proyecto financiado por el Gobierno de Arag&oacute;n.</p>
                     </section >
 
                     <!--One -->
