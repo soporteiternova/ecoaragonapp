@@ -292,7 +292,6 @@ class controller {
                     </div>
                 </div><br/>';
         $str.= map::create_map([], 600, 400, false);
-        $this->crondaemon(true);
         return $str;
     }
 }
