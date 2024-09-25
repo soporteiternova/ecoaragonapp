@@ -29,6 +29,7 @@ class controller {
     const ENDPOINT_WIND_FARM = 1;
     const ENDPOINT_SOLAR_FARM = 2;
     const ENDPOINT_COLAPSOS = 3;
+    const ENDPOINT_CURRENT_PRICE = 4;
 
     /**
      * Funcion para mostrar la cabecera html
@@ -225,6 +226,9 @@ class controller {
             case self::ENDPOINT_COLAPSOS:
                 $url = 'https://opendata.aragon.es/GA_OD_Core/download?resource_id=212&formato=json&_pageSize=10000&_page=' . date( 'H' );
                 break;
+            case self::ENDPOINT_CURRENT_PRICE:
+                $url = 'https://apidatos.ree.es/es/datos/mercados/precios-mercados-tiempo-real?start_date=' . date( 'Y-m-d\T00:00' ) . '&end_date=' . date( 'Y-m-d\T23:59' ) . '&time_trunc=hour';
+                break;
         }
         return $url;
     }
@@ -240,6 +244,9 @@ class controller {
         $ret &= $controller->actions( 'crondaemon', $debug );
 
         $controller = new \ecoaragonapp\solarfarm\controller();
+        $ret &= $controller->actions( 'crondaemon', $debug );
+
+        $controller = new \ecoaragonapp\currentprice\controller();
         $ret &= $controller->actions( 'crondaemon', $debug );
 
         return $ret;
@@ -259,20 +266,24 @@ class controller {
 
         $wind_farm_model = new \ecoaragonapp\windfarm\model();
         $solar_farm_model = new \ecoaragonapp\solarfarm\model();
+        $current_price = new \ecoaragonapp\currentprice\model();
 
-        $str = '<script src="/libs/js/ecoaragonapp.js"></script><div class="row">
-                    <div class="off-1-mobile"></div>
-                    <div class="col-3 col-12-mobile" style="border:1px solid #000000;padding:4px;"><b>Selecci&oacute;n de sistemas de generaci&oacute;n a mostrar en el mapa:</b><br/>
+        $str = '<script src="/libs/js/ecoaragonapp.js"></script><div class="row" style="margin-left:0">
+                    <div class="col-4 col-12-mobile" style="border-style: double;border-width:4px;border-color:#000000;padding:4px;"><b>Selecci&oacute;n de sistemas de generaci&oacute;n a mostrar en el mapa:</b><br/>
                         <label><input type="checkbox" id="wind_farm_checkbox" onchange="show_json_layer(\'' . $url_wind_farms . '\',\'wind_farm\');" checked/>Ver parques e&oacute;licos</label><br/>
                         <label><input type="checkbox" id="solar_farm_checkbox"  onchange="show_json_layer(\'' . $url_solar_farms . '\',\'solar_farm\');" checked/>Ver parques fotovoltaicos</label><br/>
                     </div>
-                    <div class="col-1 off-1-mobile"></div>
-                    <div class="col-4 col-12-mobile" style="border:1px solid #000000;padding:4px;">
+                    <div class="col-4 col-12-mobile" style="border-style: double;border-width:4px;border-color:#000000;padding:4px;"><br/>
                         <h2>Potencia e&oacute;lica instalada: ' . $wind_farm_model->get_installed_power() . ' MW</h2>
                         <h2>Potencia fotovoltaica instalada:  ' . $solar_farm_model->get_installed_power() . ' MW</h2>
                     </div>
+                    <div class="col-4 col-12-mobile" style="border-style: double;border-width:4px;border-color:#000000;padding:4px;"><br/>
+                        <h2>Precio actual de la electricidad:</h2>
+                        <span style="font-size: 2em; font-weight: bold;">' . $current_price->get_current_price() . '</span>
+                    </div>
                 </div><br/>';
         $str.= map::create_map([], 600, 400, false);
+        $this->crondaemon(true);
         return $str;
     }
 }

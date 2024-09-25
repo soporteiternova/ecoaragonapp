@@ -14,7 +14,7 @@
  */
 
 /**
- * Vehicle data model
+ * Wind farms data model
  * @author ITERNOVA (info@iternova.net)
  * @version 1.0.0 - 20240904
  * @package busstop

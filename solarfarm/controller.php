@@ -14,7 +14,7 @@
  */
 
 /**
- * Vehicles controller
+ * Solar farms controller
  * @author ITERNOVA (info@iternova.net)
  * @version 1.0.0 - 20240904
  * @package busstop
@@ -35,18 +35,8 @@ class controller {
         }
         switch ( $action ) {
             case 'crondaemon':
-                return $this->crondaemon( $debug );
-                break;
-            case 'get_historic':
-                return $this->get_historic();
-                break;
-            case 'show_in_map':
-                return $this->get_map_json();
-                break;
-            case 'listing':
             default:
-                return $this->listing();
-                break;
+                return $this->crondaemon( $debug );
         }
 
         return true;

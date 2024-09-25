@@ -14,7 +14,7 @@
  */
 
 /**
- * Wind farms controller
+ * Current price controller
  * @author ITERNOVA (info@iternova.net)
  * @version 1.0.0 - 20240904
  * @package busstop
@@ -22,7 +22,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace ecoaragonapp\windfarm;
+namespace ecoaragonapp\currentprice;
 
 class controller {
     /**
@@ -36,7 +36,7 @@ class controller {
         switch ( $action ) {
             case 'crondaemon':
             default:
-                return $this->crondaemon($debug);
+                return $this->crondaemon( $debug );
         }
 
         return true;
@@ -51,17 +51,21 @@ class controller {
         $datetime = date( 'H' );
         if ( $debug || $datetime === '12' ) {
             $count = 0;
-            $api_url = \ecoaragonapp\common\controller::get_endpoint_url( \ecoaragonapp\common\controller::ENDPOINT_WIND_FARM );
+            $api_url = \ecoaragonapp\common\controller::get_endpoint_url( \ecoaragonapp\common\controller::ENDPOINT_CURRENT_PRICE );
             $array_objs = json_decode( file_get_contents( $api_url ) );
 
-            if ( isset( $array_objs->features  )) {
-                foreach ( $array_objs->features as $obj ) {
-                    $obj_windfarm = new model();
-                    $obj_windfarm->update_from_api( $obj );
-                    $count++;
+            if ( isset( $array_objs->included  )) {
+                foreach ( $array_objs->included as $prices_data ) {
+                    if( $prices_data->id==="1001" && isset( $prices_data->attributes)) {
+                        foreach( $prices_data->attributes->values as $value) {
+                            $obj_windfarm = new model();
+                            $obj_windfarm->update_from_api( $value );
+                            $count++;
+                        }
+                    }
                 }
             }
-            echo '<br/><br/><br/><br/><br/>Updated ' . $count . ' wind farms';
+            echo '<br/><br/><br/><br/><br/>Updated ' . $count . ' prices';
         }
 
         return true;
@@ -71,7 +75,7 @@ class controller {
      * Returns geojson data to load map layer
      * @return void
      */
-    private function get_map_json() {
+    private function get_current_price() {
 
         $obj_model = new model();
         $array_obj = $obj_model->get_all( [], [], 0, 0, '_id', [ 'debug' => false ] );
