@@ -14,7 +14,7 @@
  */
 
 /**
- * Current price model
+ * Demand model
  * @author ITERNOVA (info@iternova.net)
  * @version 1.0.0 - 20240904
  * @package busstop
@@ -22,10 +22,10 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace ecoaragonapp\currentprice;
+namespace ecoaragonapp\demand;
 
 class model extends \ecoaragonapp\common\model {
-    public $_database_collection = 'currentprice';
+    public $_database_collection = 'demand';
     public $recordtime = '';
     public $values = [];
 
@@ -83,25 +83,26 @@ class model extends \ecoaragonapp\common\model {
     }
 
     /**
-     * Returns current price
+     * Returns current demand
      * @return int
      */
-    public function get_current_price() {
+    public function get_current_demand() {
         $array_criteria[] = [ 'recordtime', 'eq', gmdate( 'Y-m-d' ), 'string' ];
-        $array_current_prices = $this->get_all( $array_criteria, [], 0, 1 );
-        $array_current_prices = reset( $array_current_prices);
+        $array_current_demand = $this->get_all( $array_criteria, [], 0, 1 );
+        $array_current_demand = reset( $array_current_demand);
         $return  = 0.0;
-        $date_now = gmdate('Y-m-d H:00:00');
 
-        /** @var $array_current_prices \ecoaragonapp\currentprice\model */
-        foreach( $array_current_prices->values as $key => $value ) {
-            if( $value['recordtime'] === $date_now ) {
-                $return = $value['value'];
-                break;
+        /** @var $array_current_demand \ecoaragonapp\demand\model */
+        if( !empty( $array_current_demand->values)) {
+            $array_sort = [];
+            foreach ( $array_current_demand->values as $key => $value ) {
+                $array_sort[ strtotime( $value[ 'recordtime' ] ) ] = $value[ 'value' ];
             }
+            ksort( $array_sort );
+            $return = end( $array_sort );
         }
 
-        return ($return/1000) . ' &euro; kW/h';
+        return $return . ' MW';
     }
 
     /**

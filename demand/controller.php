@@ -14,7 +14,7 @@
  */
 
 /**
- * Current price controller
+ * Demandcontroller
  * @author ITERNOVA (info@iternova.net)
  * @version 1.0.0 - 20240904
  * @package busstop
@@ -22,7 +22,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace ecoaragonapp\currentprice;
+namespace ecoaragonapp\demand;
 
 class controller {
     /**
@@ -48,26 +48,25 @@ class controller {
      */
     protected function crondaemon($debug = false) {
         // Loading of wind farms data
-        $datetime = date( 'i' );
-        if ( $debug || $datetime < '05' ) {
-            $count = 0;
-            $api_url = \ecoaragonapp\common\controller::get_endpoint_url( \ecoaragonapp\common\controller::ENDPOINT_CURRENT_PRICE );
-            $array_objs = json_decode( file_get_contents( $api_url ) );
+        $count = 0;
+        $api_url = \ecoaragonapp\common\controller::get_endpoint_url( \ecoaragonapp\common\controller::ENDPOINT_CURRENT_DEMAND );
+        $array_objs = json_decode( file_get_contents( $api_url ) );
 
-            if ( isset( $array_objs->included  )) {
-                foreach ( $array_objs->included as $prices_data ) {
-                    if( $prices_data->id==="1001" && isset( $prices_data->attributes)) {
-                        foreach( $prices_data->attributes->values as $value) {
-                            $obj_price = new model();
-                            $obj_price->update_from_api( $value );
-                            $count++;
-                        }
+        if ( isset( $array_objs->included  )) {
+            foreach ( $array_objs->included as $demand_data ) {
+                if( $demand_data->id==="1293" && isset( $demand_data->attributes)) {
+                    foreach( $demand_data->attributes->values as $value) {
+                        $obj_demand = new model();
+                        $obj_demand->update_from_api( $value );
+                        $count++;
                     }
                 }
             }
-            echo '<br/><br/><br/><br/><br/>Updated ' . $count . ' prices';
         }
+        echo '<br/><br/><br/><br/><br/>Updated ' . $count . ' demand items';
+
 
         return true;
     }
+
 }
