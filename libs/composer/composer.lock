@@ -4,8 +4,57 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e797a56ff76983cdad65e3fe959d6aa2",
+    "content-hash": "9e4f93e2ce5d6be7b7d2d3ac7c468663",
     "packages": [
+        {
+            "name": "bbsnly/chartjs-php",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bbsnly/chartjs-php.git",
+                "reference": "faa561d9e5ccc43dbabc5a172dc21f27b573e6dd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bbsnly/chartjs-php/zipball/faa561d9e5ccc43dbabc5a172dc21f27b573e6dd",
+                "reference": "faa561d9e5ccc43dbabc5a172dc21f27b573e6dd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.0"
+            },
+            "default-branch": true,
+            "type": "package",
+            "autoload": {
+                "psr-4": {
+                    "Bbsnly\\ChartJs\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anatoliy Babushka",
+                    "email": "anatoliybabushka@gmail.com"
+                }
+            ],
+            "description": "PHP wrapper for Chart.js library",
+            "homepage": "https://github.com/bbsnly/chartjs-php",
+            "keywords": [
+                "chartjs",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/bbsnly/chartjs-php/issues",
+                "source": "https://github.com/bbsnly/chartjs-php/tree/main"
+            },
+            "time": "2024-09-23T10:24:26+00:00"
+        },
         {
             "name": "jean85/pretty-package-versions",
             "version": "2.0.6",
@@ -188,20 +237,20 @@
         },
         {
             "name": "symfony/polyfill-php80",
-            "version": "v1.30.0",
+            "version": "v1.31.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php80.git",
-                "reference": "77fa7995ac1b21ab60769b7323d600a991a90433"
+                "reference": "60328e362d4c2c802a54fcbf04f9d3fb892b4cf8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/77fa7995ac1b21ab60769b7323d600a991a90433",
-                "reference": "77fa7995ac1b21ab60769b7323d600a991a90433",
+                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/60328e362d4c2c802a54fcbf04f9d3fb892b4cf8",
+                "reference": "60328e362d4c2c802a54fcbf04f9d3fb892b4cf8",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.1"
+                "php": ">=7.2"
             },
             "type": "library",
             "extra": {
@@ -248,7 +297,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php80/tree/v1.30.0"
+                "source": "https://github.com/symfony/polyfill-php80/tree/v1.31.0"
             },
             "funding": [
                 {
@@ -264,13 +313,15 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-05-31T15:07:36+00:00"
+            "time": "2024-09-09T11:45:10+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "bbsnly/chartjs-php": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

@@ -24,6 +24,11 @@
 
 namespace ecoaragonapp\common;
 
+use Bbsnly\ChartJs\Chart;
+use Bbsnly\ChartJs\Config\Data;
+use Bbsnly\ChartJs\Config\Dataset;
+use Bbsnly\ChartJs\Config\Options;
+
 class controller {
 
     const ENDPOINT_WIND_FARM = 1;
@@ -31,6 +36,7 @@ class controller {
     const ENDPOINT_COLAPSOS = 3;
     const ENDPOINT_CURRENT_PRICE = 4;
     const ENDPOINT_CURRENT_DEMAND = 5;
+    const ENDPOINT_GENERATION_STRUCTURE = 6;
 
     /**
      * Funcion para mostrar la cabecera html
@@ -75,6 +81,7 @@ class controller {
             <link href="//cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" rel="stylesheet">
             <script src="libs/js/jquery.dataTables.min.js"></script>
             <script src="/libs/js/ecoaragonapp.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 		</head>';
 
         if ( $echo ) {
@@ -233,6 +240,9 @@ class controller {
             case self::ENDPOINT_CURRENT_DEMAND:
                 $url = 'https://apidatos.ree.es/es/datos/demanda/demanda-tiempo-real?start_date=' . date( 'Y-m-d\T00:00' ) . '&end_date=' . date( 'Y-m-d\T23:59' ) . '&time_trunc=hour';
                 break;
+            case self::ENDPOINT_GENERATION_STRUCTURE:
+                $url = 'https://apidatos.ree.es/es/datos/generacion/estructura-generacion?start_date=' . date( 'Y' ) . '-01-01T00:00&end_date=' . date( 'Y' ) . '-12-31T23:59&time_trunc=month&geo_trunc=electric_system&geo_limit=ccaa&geo_ids=5';
+                break;
         }
         return $url;
     }
@@ -254,6 +264,9 @@ class controller {
         $ret &= $controller->actions( 'crondaemon', $debug );
 
         $controller = new \ecoaragonapp\demand\controller();
+        $ret &= $controller->actions( 'crondaemon', $debug );
+
+        $controller = new \ecoaragonapp\structure\controller();
         $ret &= $controller->actions( 'crondaemon', $debug );
 
         return $ret;
@@ -290,8 +303,52 @@ class controller {
                         <span style="font-size:1.5em;">Precio actual: </span><br/><span style="font-size: 2em; font-weight: bold;">' . $current_price->get_current_price() . '</span><br/>
                         <span style="font-size:1.5em;">Demanda nacional actual: </span><br/><span style="font-size: 2em; font-weight: bold;">' . $current_demand->get_current_demand() . '</span>
                     </div>
-                </div><br/>';
+                </div><br/>
+                <div class="row" style="margin-left:0;margin-top:0">
+                    <div class="col-6 col-12-mobile" style="border-style: double;border-width:4px;border-color:#000000;padding:4px;">
+                        <span style="font-size:1.5em;font-weight: bold;">Estructura de generaci&oacute;n en Arag&oacute;n:</span><br/>
+                    ' . $this->generate_structure_chart() . '
+                    </div>
+                    <div class="col-6 col-12-mobile">
+                    
+                    </div>
+                </div>';
         $str.= map::create_map([], 600, 400, false);
+        //$this->crondaemon(true);
+        return $str;
+    }
+
+    private function generate_structure_chart(){
+        $obj_structure = new \ecoaragonapp\structure\model();
+        $array_structure = $obj_structure->get_structure();
+
+        $array_labels = [];
+        $array_data = [];
+        $array_colors = [];
+
+        foreach ( $array_structure as $title => $structure ) {
+            $array_labels[] = $title;
+            $array_data[] = $structure[ 'value' ];
+            $array_colors[] = $structure[ 'color' ];
+        }
+
+        $str = "<canvas id='generation_structure_chart'></canvas><script>
+              const ctx = document . getElementById( 'generation_structure_chart' );
+            
+              new Chart( ctx, {
+                        type: 'doughnut',
+                data: {
+                            labels:
+                            " . json_encode( $array_labels ) . ",
+                  datasets: [{label:'MWh', data:" . json_encode( $array_data ) . ",backgroundColor: " . json_encode( $array_colors ) . "}]
+                },
+                options: {
+                            responsive: true,
+                        }
+              });
+            </script>";
+
+
         return $str;
     }
 }

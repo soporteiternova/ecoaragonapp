@@ -37,12 +37,6 @@ class model extends \ecoaragonapp\common\model {
      * @return bool
      */
     public function update_from_api( $api_object ) {
-        /**
-         * object(stdClass)#6 (3) {
-         * ["type"]=> string(7) "Feature"
-         * ["geometry"]=> object(stdClass)#7 (2) { ["type"]=> string(7) "Polygon" ["coordinates"]=> array(1) { [0]=> array(10) { [0]=> array(2) { [0]=> float(637445.9642) [1]=> float(4632463.0812) } [1]=> array(2) { [0]=> float(634456.9504) [1]=> float(4631100.1146) } [2]=> array(2) { [0]=> float(634412.9587) [1]=> float(4631833.1172) } [3]=> array(2) { [0]=> float(634515.9709) [1]=> float(4632925.1152) } [4]=> array(2) { [0]=> float(634712.9861) [1]=> float(4634351.1056) } [5]=> array(2) { [0]=> float(635155.9849) [1]=> float(4634322.0996) } [6]=> array(2) { [0]=> float(635876.9806) [1]=> float(4634012.0916) } [7]=> array(2) { [0]=> float(636553.9775) [1]=> float(4633780.0841) } [8]=> array(2) { [0]=> float(638107.9677) [1]=> float(4633080.0677) } [9]=> array(2) { [0]=> float(637445.9642) [1]=> float(4632463.0812) } } } }
-         * ["properties"]=> object(stdClass)#8 (4) { ["objectid"]=> int(1) ["parque"]=> string(16) "Multitecnología" ["titular"]=> string(20) "Renovables ARA-IN SL" ["potencia"]=> int(32) } }
-         */
         $this->_id = null;
         $ret = false;
 

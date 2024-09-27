@@ -14,7 +14,7 @@
  */
 
 /**
- * Demand model
+ * Generation structure model
  * @author ITERNOVA (info@iternova.net)
  * @version 1.0.0 - 20240904
  * @package busstop
@@ -22,12 +22,15 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace ecoaragonapp\demand;
+namespace ecoaragonapp\structure;
 
 class model extends \ecoaragonapp\common\model {
-    public $_database_collection = 'demand';
+    public $_database_collection = 'generation_structure';
+    public $title = '';
+    public $color = '';
     public $recordtime = '';
     public $values = [];
+    public $last_value = 0.0;
 
     /**
      * Updates a glide object from open data api, and creates it if doesn't exist
@@ -36,39 +39,55 @@ class model extends \ecoaragonapp\common\model {
      *
      * @return bool
      */
-    public function update_from_api( $api_object ) {
+    public function update_from_api( $api_object_value, $api_object_structure ) {
         $this->_id = null;
         $ret = false;
 
-        if( isset( $api_object->value)) {
+        if( isset( $api_object_value->value)) {
 
-            $recordtime_search = date( 'Y-m-d', strtotime( $api_object->datetime ) );
+            $recordtime_search = substr( $api_object_value->datetime,0,4);
             $array_criteria[] = [ 'recordtime', 'eq', $recordtime_search, 'string' ];
+            $array_criteria[] = [ 'title', 'eq', $api_object_structure->title, 'string' ];
 
             $array_obj = $this->get_all( $array_criteria, [], 0, 1 );
             if ( !empty( $array_obj ) ) {
                 $saved_obj = reset( $array_obj );
                 $this->_id = $saved_obj->_id;
+                $this->title = $saved_obj->title;
+                $this->color = $saved_obj->color;
                 $this->values = $saved_obj->values;
+                $this->last_value = $saved_obj->last_value;
                 $this->recordtime = $saved_obj->recordtime;
                 $this->created_at = $saved_obj->created_at;
             } else {
                 $this->created_at = date( 'Y-m-d H:i:s' );
                 $this->recordtime = $recordtime_search;
+                $this->title = $api_object_structure->title;
+                $this->color = $api_object_structure->color;
             }
 
-            $value_recordtime = date('Y-m-d H:i:s', strtotime($api_object->datetime));
-            $updated = false;
-            foreach( $this->values as $value ){
-                if( $value['recordtime'] == $value_recordtime ) {
-                    $value['value'] = $api_object->value;
-                    $value['percentage'] = $api_object->percentage;
-                    $updated = true;
+            $update = true;
+            $value_date = substr($api_object_value->datetime,0,10);
+            foreach( $this->values as $value){
+                if( $value['recordtime'] === $value_date ){
+                    $update = false;
+                    break;
                 }
             }
-            if( !$updated){
-                $this->values[] = [ 'recordtime' => $value_recordtime, 'value' => $api_object->value, 'percentage' => $api_object->percentage ];
+
+            if( $update ){
+                $this->values[] = [ 'recordtime' => $value_date, 'value' => $api_object_value->value, 'percentage' => $api_object_value->percentage ];
+
+                $last_recordtime = 0;
+                foreach ( $this->values as $value ) {
+                    $value_recordtime = strtotime( $value['recordtime'] . '  00:00:00' );
+                    if ( $value_recordtime > $last_recordtime ) {
+                        $last_recordtime = $value_recordtime;
+                        $this->last_value = $value['value'];
+                    }
+                }
             }
+
 
             $ret = $this->store();
         }
@@ -77,26 +96,27 @@ class model extends \ecoaragonapp\common\model {
     }
 
     /**
-     * Returns current demand
-     * @return int
+     * Returns current price
+     * @return array
      */
-    public function get_current_demand() {
-        $array_criteria[] = [ 'recordtime', 'eq', gmdate( 'Y-m-d' ), 'string' ];
-        $array_current_demand = $this->get_all( $array_criteria, [], 0, 1 );
-        $array_current_demand = reset( $array_current_demand);
-        $return  = 0.0;
+    public function get_structure() {
+        $array_objs = $this->get_all();
+        $return  = [];
 
-        /** @var $array_current_demand \ecoaragonapp\demand\model */
-        if( !empty( $array_current_demand->values)) {
-            $array_sort = [];
-            foreach ( $array_current_demand->values as $key => $value ) {
-                $array_sort[ strtotime( $value[ 'recordtime' ] ) ] = $value[ 'value' ];
+        foreach( $array_objs as $obj ) {
+            $title = \ecoaragonapp\common\utils::detect_utf8( $obj->title );
+            $value = (int)$obj->last_value/1000;
+            if( !isset( $return[ $title ] ) ) {
+                $return[ $title] = ['year' => $obj->recordtime, 'value' => $value, 'color' => $obj->color];
+            } else {
+                if( $return[ $title ]['year'] < $obj->recordtime ) {
+                    $return[ $title ]['year'] = $obj->recordtime;
+                    $return[ $title ]['value'] = $value;
+                }
             }
-            ksort( $array_sort );
-            $return = end( $array_sort );
         }
 
-        return $return . ' MW';
+        return $return;
     }
 
     /**
@@ -122,13 +142,19 @@ class model extends \ecoaragonapp\common\model {
      * @return void
      */
     public function object_encode_data( $to_utf8 = false ) {
+        $callback_function = \ecoaragonapp\common\utils::class . ( $to_utf8 ? '::detect_utf8' : '::detect_iso8859_1' );
+
         // Dates (format \MongoDate en UTC+0)
         $array_fields_datetime = [ 'updated_at', 'created_at' ];
         foreach ( $array_fields_datetime as $key ) {
             $this->{$key} = \ecoaragonapp\common\databasemongo::datetime_mongodate( $this->{$key}, $to_utf8, false );
         }
         $this->recordtime = (string)$this->recordtime;
+        $this->title = (string) \call_user_func( $callback_function, $this->title);
+        $this->color = (string)$this->color;
         $this->active = (boolean)$this->active;
+        $this->last_value = (float)$this->last_value;
+
         foreach( $this->values as $key => $value ) {
             $this->values[$key]['value'] = (float)$value['value'];
             $this->values[$key]['percentage'] = (float)$value['percentage'];

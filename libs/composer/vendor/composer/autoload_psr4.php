@@ -11,4 +11,5 @@ return array(
     'MongoDB\\' => array($vendorDir . '/mongodb/mongodb/src'),
     'Jupitern\\' => array($vendorDir . '/jupitern/table/src'),
     'Jean85\\' => array($vendorDir . '/jean85/pretty-package-versions/src'),
+    'Bbsnly\\ChartJs\\' => array($vendorDir . '/bbsnly/chartjs-php/src'),
 );

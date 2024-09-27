@@ -29,6 +29,10 @@ class ComposerStaticInitf075cee6becce57e1d656377ec857eae
             'Jupitern\\' => 9,
             'Jean85\\' => 7,
         ),
+        'B' => 
+        array (
+            'Bbsnly\\ChartJs\\' => 15,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -51,6 +55,10 @@ class ComposerStaticInitf075cee6becce57e1d656377ec857eae
         'Jean85\\' => 
         array (
             0 => __DIR__ . '/..' . '/jean85/pretty-package-versions/src',
+        ),
+        'Bbsnly\\ChartJs\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/bbsnly/chartjs-php/src',
         ),
     );
 
