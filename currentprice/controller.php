@@ -43,7 +43,7 @@ class controller {
     }
 
     /**
-     * Gets glide list from opendata repository.
+     * Gets current price from ree api.
      * @return bool
      */
     protected function crondaemon($debug = false) {

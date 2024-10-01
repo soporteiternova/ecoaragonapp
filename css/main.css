@@ -3311,7 +3311,7 @@ body.index #main {
     font-weight: bold;
 }
 
-.incidents_map{
+.ecoaragonapp_map{
     position: relative;
     padding-bottom: 75%; //This is the aspect ratio
     height: 0;

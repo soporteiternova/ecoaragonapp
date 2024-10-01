@@ -33,7 +33,7 @@ class model extends \ecoaragonapp\common\model {
     public $potencia_inversor = 0.0;
 
     /**
-     * Updates a glide object from open data api, and creates it if doesn't exist
+     * Updates a solar farm object from open data api, and creates it if doesn't exist
      *
      * @param $api_object
      *
@@ -102,12 +102,11 @@ class model extends \ecoaragonapp\common\model {
         $array_opts[] = [ 'recordtime', 'gte', $date_min, 'MongoDate' ];
         $array_opts[] = [ 'recordtime', 'lte', $date_max, 'MongoDate' ];
 
-        $array_glides = $this->get_all( $array_opts, [], 0, 2000 );
+        $array_solar_farms = $this->get_all( $array_opts, [], 0, 2000 );
 
-        if( !empty( $array_glides ) ) {
-            foreach( $array_glides as $glide ) {
-                $ret['features'][] = ['type' => 'Feature', 'properties' => [ 'description' => $glide->parque ], 'geometry' => json_decode( $glide->geometry) ];
-                //echo( $glide->geometry);
+        if( !empty( $array_solar_farms ) ) {
+            foreach( $array_solar_farms as $solar_farm ) {
+                $ret['features'][] = ['type' => 'Feature', 'properties' => [ 'description' => $solar_farm->parque ], 'geometry' => json_decode( $solar_farm->geometry) ];
             }
         }
         return json_encode( $ret );

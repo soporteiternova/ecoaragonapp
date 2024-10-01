@@ -24,11 +24,6 @@
 
 namespace ecoaragonapp\common;
 
-use Bbsnly\ChartJs\Chart;
-use Bbsnly\ChartJs\Config\Data;
-use Bbsnly\ChartJs\Config\Dataset;
-use Bbsnly\ChartJs\Config\Options;
-
 class controller {
 
     const ENDPOINT_WIND_FARM = 1;
@@ -38,6 +33,8 @@ class controller {
     const ENDPOINT_CURRENT_DEMAND = 5;
     const ENDPOINT_GENERATION_STRUCTURE = 6;
     const ENDPOINT_GREEN = 7;
+    const ENDPOINT_AEMET_STATIONS_LIST = 8;
+    const ENDPOINT_AEMET_OBSERVATION_ALL = 9;
 
     /**
      * Funcion para mostrar la cabecera html
@@ -247,6 +244,12 @@ class controller {
             case self::ENDPOINT_GREEN:
                 $url = 'https://apidatos.ree.es/es/datos/generacion/estructura-renovables?start_date=' . date( 'Y' ) . '-01-01T00:00&end_date=' . date( 'Y' ) . '-12-31T23:59&time_trunc=month&geo_trunc=electric_system&geo_limit=ccaa&geo_ids=5';
                 break;
+            case self::ENDPOINT_AEMET_STATIONS_LIST:
+                $url = 'https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/todasestaciones';
+                break;
+            case self::ENDPOINT_AEMET_OBSERVATION_ALL:
+                $url = 'https://opendata.aemet.es/opendata/api/observacion/convencional/todas';
+                break;
         }
         return $url;
     }
@@ -274,6 +277,9 @@ class controller {
         $ret &= $controller->actions( 'crondaemon', $debug );
 
         $controller = new \ecoaragonapp\green\controller();
+        $ret &= $controller->actions( 'crondaemon', $debug );
+
+        $controller = new \ecoaragonapp\weather\controller();
         $ret &= $controller->actions( 'crondaemon', $debug );
 
         return $ret;
@@ -321,7 +327,8 @@ class controller {
                     ' . $this->generate_structure_chart(true) . '
                     </div>
                 </div><br/>';
-        $str.= map::create_map([], 600, 400, false);
+        $obj_weather = new \ecoaragonapp\weather\model();
+        $str.= map::create_map( $obj_weather->get_array_markers(), 600, 400, false);
         //$this->crondaemon(true);
         return $str;
     }
@@ -347,15 +354,16 @@ class controller {
             
               new Chart( {$js_element}, {
                         type: 'doughnut',
-                data: {
-                            labels:
-                            " . json_encode( $array_labels ) . ",
-                  datasets: [{label:'MWh', data:" . json_encode( $array_data ) . ",backgroundColor: " . json_encode( $array_colors ) . "}]
-                },
-                options: {
-                            responsive: true,
-                        }
-              });
+                        data: {
+                               labels: " . json_encode( $array_labels ) . ",
+                               datasets: [
+                                    {label:'MWh', data:" . json_encode( $array_data ) . ",backgroundColor: " . json_encode( $array_colors ) . "}
+                                ]
+                        },
+                        options: {
+                                    responsive: true,
+                                }
+                      });
             </script>";
 
 

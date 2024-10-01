@@ -48,7 +48,12 @@ class map {
         $rand = rand();
 
         // JS googlemaps
-        $str = '<script type="text/javascript" src="https://maps.google.com/maps/api/js?key=' . self::google_key() . '&callback=initialize' . $rand . '" async defer></script>';
+        $str = '<script>
+                      (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+                        key: "' . self::google_key() . '",
+                        v: "weekly",
+                      });
+                </script>';
 
         // Capas
         /*$arrayopts[ 'wms_layers' ][] = [
@@ -70,11 +75,33 @@ class map {
         $arrayopts=[];
         [ $str_layers, $map_layers ] = self::get_layers_config_wms( $rand, $arrayopts );
 
+        $str_markers = '';
+
+        if( is_array( $array_markers)){
+            $str_markers.= 'const parser = new DOMParser();';
+            foreach( $array_markers as $marker){
+                $str_markers .= 'const pin_marker_' . $marker['id'] . ' = \'<svg xmlns="http://www.w3.org/2000/svg" width="60" height="40" viewBox="0 0 100 20" style="border:1px solid;background-color: #aaaaaa"><text font-weight="bold" font-size="2em" x="5" y="5" dominant-baseline="middle">' . $marker['title'] . '</text>></svg>\';
+                                 const marker_' . $marker['id'].' = new google.maps.marker.AdvancedMarkerElement({
+                                 
+                                    map: window["map' . $rand . '"],
+                                    position: {"lat": ' . $marker['lat'] . ', "lng": ' . $marker['lng'] . '},
+                                    title: "' . $marker['title'] . '",
+                                    content: parser.parseFromString(pin_marker_' . $marker[ 'id' ] . ', "image/svg+xml").documentElement,
+                                });';
+            }
+        }
+
         // Generamos el mapa
-        $str .= "<script type=\"text/javascript\">
-                window['map{$rand}']=null;
- 				function initialize{$rand}(){
-                    const centerPoint = {lat: 41.65, lng: -0.87};
+        $str .= '<script type="text/javascript">
+                window["map' . $rand . '"]=null;
+
+                async function initialize' . $rand . '() {
+                    const { Map } = await google.maps.importLibrary( "maps" );
+                    const { Marker } = await google.maps.importLibrary( "marker" );
+                    let center = { lat: 41.65606, lng: -0.87734 };
+                    let zoom = 6;
+                    let center_user = ' . json_encode($set_center_user ) . ';
+                    const url_json_aragon = "' . utils::get_server_url() . '/common/files/comunidades.geojson";
                     const ARAGON_BOUNDS= {
                           north: 42.93,
                           south: 39.85,
@@ -82,73 +109,36 @@ class map {
                           east: 0.77,
                     };
                     
-                   const styledMap = new google.maps.StyledMapType([
-                          {
-                                'featureType': 'poi',
-                                'stylers': [
-                                    {'visibility': 'off'}
-                                ]
-                          }, {
-                                'featureType': 'transit',
-                                'stylers': [
-                                    {'visibility': 'off'}
-                                ]
-                          },{
-                            'featureType': 'road',
-                            'stylers': [ {
-                                'visibility': 'off'
-                                } ]
-                        }, {
-                        'featureType': 'landscape',
-                                'elementType': 'labels',
-                                'stylers': [
-                                  {
-                                      'visibility': 'on' }
-                            ]
-                        }],
-                        { name: 'Mapa' });
-                        
- 					 window['map{$rand}'] = new google.maps.Map(document.getElementById('incidents_map$rand'),{
-                                                        zoom:12,
-                                                        center: centerPoint,
-                                                        backgroundColor: 'hsla(0, 0%, 0%, 0)',
-                                                        restriction: {
-                                                            latLngBounds: ARAGON_BOUNDS,
-                                                            strictBounds: false
-                                                        },                                           
-                                                    });
-                                                                                 
-                    window['map_id'] = 'map{$rand}';
-                    window['layer_wind_farm'] = new google.maps.Data();
-                    window['layer_solar_farm'] = new google.maps.Data();
-                    window['map{$rand}'].setZoom({$zoom});
-                    $('#wind_farm_checkbox').trigger('change');
-                    $('#solar_farm_checkbox').trigger('change');
-                    ";
-        if ( $set_center_user ) {
-            $str .= "if (navigator.geolocation) {
-                     navigator.geolocation.getCurrentPosition(function (position) {
-                         initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                         window['map{$rand}'].setCenter(initialLocation);
-                     });
-                 }";
-        }
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        center = {lat: position.coords.latitude, lng: position.coords.longitude};
+                        zoom = 12;
+                    });
+                     
+                    window["map' . $rand . '"] = new Map(document.getElementById("ecoaragonapp_map' . $rand . '") ,{
+                                zoom: zoom,
+                                center: center,
+                                backgroundColor: "hsla( 0, 0 %, 0 %, 0 )",
+                                restriction: {
+                                    latLngBounds: ARAGON_BOUNDS,
+                                    strictBounds: false
+                                },
+                                mapId: "ecoaragonapp_map' . $rand . '",
+                            });     
+                    window["map_id"] = "map' . $rand . '";
+                    window["layer_wind_farm"] = new google.maps.Data();
+                    window["layer_solar_farm"] = new google.maps.Data();
+                    $("#wind_farm_checkbox").trigger( "change" );
+                    $("#solar_farm_checkbox").trigger( "change" );
+                    
+                    ' . $str_layers . '                     
+                    window["map' . $rand . '"].data.loadGeoJson(url_json_aragon);
+                    ' . $str_markers . '
+                }
+                
+                initialize' . $rand . '();
+       </script>';
 
-
-        $str .= $str_layers;
-
-        $str .= 'load_comunidad_' . $rand . '();';
-        $str .= '}';
-
-        $str .= 'function load_comunidad_' . $rand .'(){map' . $rand . '.data.loadGeoJson(
-                    "' . utils::get_server_url() . '/common/files/comunidades.geojson"
-              );}';
-
-
-        $str .= '</script>';
-
-        $str .= '<div class="incidents_map" id="incidents_map' . $rand . '" style="height:' . $sizey . 'px;width:100%;"></div>';
-
+        $str .= '<div class="ecoaragonapp_map" id="ecoaragonapp_map' . $rand . '" style="height:' . $sizey . 'px;width:100%;"></div>';
 
         return $str;
     }
@@ -263,47 +253,10 @@ class map {
         $action = controller::get( 'action' );
         $ret = '';
         switch ($action){
-            case 'deslizamientos_json':
-                $ret = $this->deslizamientos_json();
-                break;
             default:
         }
 
         return $ret;
-    }
-
-    /**
-     * Devuelve json para deslizamientos
-     * @return string
-     */
-    private function deslizamientos_json() {
-        $date_min = controller::get('dateMIN');
-        $date_max = controller::get('dateMAX');
-
-        if( empty( $date_min ) ) {
-            $date_min = date('Y-m-d 00:00:00', strtotime( '-1 year') );
-        } else {
-            $date_min = date('Y-m-d 00:00:00', strtotime( $date_min ) );
-        }
-
-        if( empty( $date_max) ) {
-            $date_max = date( 'Y-m-d 23:59:59' );
-        } else {
-            $date_max = date( 'Y-m-d 00:00:00', strtotime( $date_max ) );
-        }
-
-        $hash = sha1( 'wind_farm' . $date_min . '_' . $date_max );
-        $file_path = utils::get_path() . '/cache/' . $hash;
-
-        if( file_exists( $file_path ) ) {
-            return file_get_contents( $file_path );
-        }
-
-        $obj_glide = new \ecoaragonapp\deslizamientos\model();
-
-        $geojson = $obj_glide->get_json( $date_min, $date_max );
-        return $geojson;
-
     }
 
 }

@@ -1,2 +1,4 @@
 .idea/
 /config/mongodb.key
+/config/aemet.key
+/config/googlemaps.key

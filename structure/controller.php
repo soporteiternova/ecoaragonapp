@@ -43,7 +43,7 @@ class controller {
     }
 
     /**
-     * Gets glide list from opendata repository.
+     * Gets generation structure data from ree api.
      * @return bool
      */
     protected function crondaemon($debug = false) {

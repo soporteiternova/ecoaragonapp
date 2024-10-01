@@ -47,6 +47,8 @@ abstract class model {
         ];
     public $geometry = [];
 
+    public $lat_lng = [0.0,0.0];
+
     /**
      * Constructor. Crea el objeto seteando los atributos pasados por parametro
      *

@@ -14,7 +14,7 @@
  */
 
 /**
- * Solar farms controller
+ * Stations controller
  * @author ITERNOVA (info@iternova.net)
  * @version 1.0.0 - 20240904
  * @package busstop
@@ -22,7 +22,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace ecoaragonapp\solarfarm;
+namespace ecoaragonapp\weather;
 
 class controller {
     /**
@@ -53,22 +53,40 @@ class controller {
     }
 
     /**
-     * Gets solar farms list from aragon opendata repository.
+     * Gets stations list from aemet
      * @return bool
      */
     protected function crondaemon($debug = false) {
         // Loading of solar farms data
-        $datetime = date( 'H' );
-        if ( $debug || $datetime === '12' ) {
+        $datetime = date( 'H' ) % 2;
+        if ( $debug || $datetime === 0 ) {
             $count = 0;
-            $api_url = \ecoaragonapp\common\controller::get_endpoint_url( \ecoaragonapp\common\controller::ENDPOINT_SOLAR_FARM );
-            $array_objs = json_decode( file_get_contents( $api_url ) );
+            $obj_api = new \ecoaragonapp\common\aemetapi();
+            $api_url = \ecoaragonapp\common\controller::get_endpoint_url( \ecoaragonapp\common\controller::ENDPOINT_AEMET_STATIONS_LIST );
+            $response = $obj_api->do_request($api_url);
 
-            if ( isset( $array_objs->features  )) {
-                foreach ( $array_objs->features as $obj ) {
-                    $obj_solarfarm = new model();
-                    $obj_solarfarm->update_from_api( $obj );
-                    $count++;
+            // Stations list to get identification of stations located in Aragon
+            $array_stations_indicatives = [];
+            if ( isset( $response['data']  )) {
+                foreach ( $response[ 'data' ] as $station ) {
+                    if( in_array( $station['provincia'], ['HUESCA', 'TERUEL', 'ZARAGOZA' ] ) ){
+                        $array_stations_indicatives[] = $station['indicativo'];
+                    }
+                }
+            }
+
+            // Observations
+            $api_url = \ecoaragonapp\common\controller::get_endpoint_url( \ecoaragonapp\common\controller::ENDPOINT_AEMET_OBSERVATION_ALL );
+            $response = $obj_api->do_request( $api_url );
+
+            if( isset( $response[ 'data' ] ) ) {
+                $obj_model = new model();
+
+                foreach( $response[ 'data' ] as $station ) {
+                    if( in_array( $station['idema'], $array_stations_indicatives ) ) {
+                        $obj_model->update_from_api( $station );
+                        $count++;
+                    }
                 }
             }
             echo '<br/><br/><br/><br/><br/>Updated ' . $count . ' solar farms';

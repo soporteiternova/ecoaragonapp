@@ -18,3 +18,4 @@ En el directorio `config` se deben crear dos ficheros de texto plano, que inclui
 
 * `googlemaps.key` clave de API para GoogleMaps
 * `mongodb.key` contraseña para la base de datos MongoDB. La base de datos deberá llamarse `ecoaragonapp` y el usuario que acceda deberá llamarse `ecoaragonapp`.
+* `aemet.key` clave para acceso a la API de AEMET open data.

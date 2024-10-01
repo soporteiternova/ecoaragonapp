@@ -33,7 +33,7 @@ class model extends \ecoaragonapp\common\model {
     public $last_value = 0.0;
 
     /**
-     * Updates a glide object from open data api, and creates it if doesn't exist
+     * Updates a green object from open data api, and creates it if doesn't exist
      *
      * @param $api_object
      *

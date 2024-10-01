@@ -30,7 +30,7 @@ class model extends \ecoaragonapp\common\model {
     public $values = [];
 
     /**
-     * Updates a glide object from open data api, and creates it if doesn't exist
+     * Updates a current price object from open data api, and creates it if doesn't exist
      *
      * @param $api_object
      *

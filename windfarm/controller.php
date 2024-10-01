@@ -53,7 +53,7 @@ class controller {
     }
 
     /**
-     * Gets glide list from opendata repository.
+     * Gets wind farms list from aragon opendata repository.
      * @return bool
      */
     protected function crondaemon($debug = false) {
